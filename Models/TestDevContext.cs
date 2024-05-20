@@ -8,6 +8,7 @@ public partial class TestDevContext : DbContext
 {
     public TestDevContext()
     {
+
     }
 
     public TestDevContext(DbContextOptions<TestDevContext> options)
