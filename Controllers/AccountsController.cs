@@ -1,6 +1,7 @@
 ﻿using Account.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,18 +33,45 @@ public class AccountsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("account-details/{id}")]
-    public async Task<IActionResult> GetAccountDetails(int id)
-    {
-        var accountDetails = await _context.Accounts
-            .Where(a => a.AccNumber == id.ToString())
-            .Select(a => new
-            {
-                a.AccNumber,
-                a.Balance
-            })
-            .ToListAsync();
+    //[HttpGet("account-details/{id}")]
+    //public async Task<IActionResult> GetAccountDetails(int id)
+    //{
+    //    var accountDetails = await _context.Accounts
+    //        .Where(a => a.AccNumber.StartsWith(id.ToString()))
+    //        .Select(a => new
+    //        {
+    //            a.AccNumber,
+    //            a.Balance
+    //        })
+    //                .ToListAsync();
 
-        return Ok(accountDetails);
+    //    return Ok(accountDetails);
+
+    //}
+
+    [HttpGet("{accNumber}")]
+    public async Task<IActionResult> GetAccountDetails(string accNumber)
+    {
+        var account = await _context.Accounts
+            .Where(a => a.AccNumber == accNumber)
+            .FirstOrDefaultAsync();
+
+        if (account == null)
+        {
+            return NotFound();
+        }
+
+        var details = new
+        {
+            account.AccNumber,
+            account.Balance,
+            Children = _context.Accounts
+                .Where(a => a.AccParent == accNumber)
+                .Select(a => new { a.AccNumber, a.Balance })
+        };
+
+        return Ok(details);
     }
+
+
 }

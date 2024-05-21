@@ -43,12 +43,11 @@ app.UseRouting();
 
 app.UseCors("AllowAll");
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    // Serve the index.html file for the root URL
-    endpoints.MapFallbackToFile("/index.html");
-});
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

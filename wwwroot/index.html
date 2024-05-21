@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Accounts</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/Accounts/top-level-accounts',
+                method: 'GET',
+                success: function (data) {
+                    var rows = '';
+                    data.forEach(function (Accounts) {
+                        rows += `<tr data-id="${Accounts.topLevelAccount}">
+                                        <td>${Accounts.topLevelAccount}</td>
+                                        <td>${Accounts.totalBalance}</td>
+                                     </tr>`;
+                    });
+                    $('tbody').html(rows);
+
+                    $("tr").dblclick(function () {
+                        var accountNumber = $(this).data('id');
+                        $.ajax({
+                            url: '/api/accounts/' + accountNumber,
+                            method: "GET",
+                            success: function (data) {
+                                var message = 'Account Number: ' + data.accNumber + '\n' +
+                                    'Balance: ' + data.balance + '\n';
+
+                                if (data.children && data.children.length > 0) {
+                                    message += 'Children: ' + data.children.map(function (child) {
+                                        return child.accNumber + ' (Balance: ' + child.balance + ')';
+                                    }).join(', ');
+                                } else {
+                                    message += 'Children: None';
+                                }
+
+                                alert(message);
+                            },
+                            error: function () {
+                                alert("Error retrieving account details");
+                            }
+                        });
+                    });
+                },
+                error: function () {
+                    alert("Error retrieving accounts");
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <table id="accountsTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Top Level Account</th>
+                <th>Total Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+</tbody>
+    </table>
+</body>
+</html>
+
+
+
